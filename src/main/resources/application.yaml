@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: crypto_investment
+  datasource:
+    url: jdbc:postgresql://localhost:5432/crypto_investment
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: create
+    show-sql: true
