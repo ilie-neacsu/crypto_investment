@@ -2,8 +2,8 @@ package com.epam.crypto_investment.controller;
 
 import com.epam.crypto_investment.dto.CryptoPriceDTO;
 import com.epam.crypto_investment.service.CryptoPriceMapper;
+import com.epam.crypto_investment.service.CryptoPriceService;
 import com.epam.crypto_investment.service.CsvParsingService;
-import com.epam.crypto_investment.service.ProcessingService;
 import com.epam.crypto_investment.entity.CryptoPrice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,16 +34,16 @@ public class IngestionController {
     private static final Logger logger = Logger.getLogger(IngestionController.class.getName());
 
     private final CsvParsingService csvParsingService;
-    private final ProcessingService processingService;
+    private final CryptoPriceService cryptoPriceService;
     private final CryptoPriceMapper cryptoPriceMapper;
 
     public IngestionController(
             CryptoPriceMapper cryptoPriceMapper,
             CsvParsingService csvParsingService,
-            ProcessingService processingService) {
+            CryptoPriceService cryptoPriceService) {
         this.cryptoPriceMapper = cryptoPriceMapper;
         this.csvParsingService = csvParsingService;
-        this.processingService = processingService;
+        this.cryptoPriceService = cryptoPriceService;
     }
 
     @GetMapping("/threads-test")
@@ -75,7 +75,7 @@ public class IngestionController {
                     .map(cryptoPriceMapper::toEntity)
                     .toList();
 
-            processingService.processCryptoPrices(validCryptoPrices);
+            cryptoPriceService.saveCryptoPrices(validCryptoPrices);
 
             Files.delete(tempFile);
 
@@ -90,7 +90,8 @@ public class IngestionController {
         binder.validate();
         BindingResult result = binder.getBindingResult();
         if (result.hasErrors()) {
-            result.getAllErrors().forEach(error -> logger.warning("Invalid entry: " + error.getDefaultMessage()));
+            result.getAllErrors().forEach(
+                    error -> logger.warning("Ignoring invalid entry: " + error.getDefaultMessage()));
             return false;
         }
         return true;
