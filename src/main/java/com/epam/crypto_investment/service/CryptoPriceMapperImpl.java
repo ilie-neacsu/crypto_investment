@@ -1,7 +1,7 @@
 package com.epam.crypto_investment.service;
 
-import com.epam.crypto_investment.dto.CryptoDto;
-import com.epam.crypto_investment.entity.Crypto;
+import com.epam.crypto_investment.dto.CryptoPriceDTO;
+import com.epam.crypto_investment.entity.CryptoPrice;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -10,15 +10,15 @@ import java.time.ZoneId;
 
 
 @Component
-public class CryptoMapperImpl implements CryptoMapper {
+public class CryptoPriceMapperImpl implements CryptoPriceMapper {
 
     @Override
-    public Crypto toEntity(CryptoDto dto) {
+    public CryptoPrice toEntity(CryptoPriceDTO dto) {
         if (dto == null) {
             return null;
         }
 
-        Crypto crypto = new Crypto();
+        CryptoPrice crypto = new CryptoPrice();
         crypto.setTimestamp(toLocalDateTime(dto.getTimestamp()));
         crypto.setSymbol(dto.getSymbol());
         crypto.setPrice(dto.getPrice());
@@ -27,12 +27,12 @@ public class CryptoMapperImpl implements CryptoMapper {
     }
 
     @Override
-    public CryptoDto toDto(Crypto entity) {
+    public CryptoPriceDTO toDto(CryptoPrice entity) {
         if (entity == null) {
             return null;
         }
 
-        CryptoDto dto = new CryptoDto();
+        CryptoPriceDTO dto = new CryptoPriceDTO();
         dto.setTimestamp(toTimestamp(entity.getTimestamp()));
         dto.setSymbol(entity.getSymbol());
         dto.setPrice(entity.getPrice());

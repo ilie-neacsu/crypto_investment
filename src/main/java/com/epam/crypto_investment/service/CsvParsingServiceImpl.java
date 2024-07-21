@@ -1,6 +1,6 @@
 package com.epam.crypto_investment.service;
 
-import com.epam.crypto_investment.dto.CryptoDto;
+import com.epam.crypto_investment.dto.CryptoPriceDTO;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -16,8 +16,8 @@ import java.util.List;
 public class CsvParsingServiceImpl implements CsvParsingService {
 
     @Override
-    public List<CryptoDto> parseCsvFile(Path filePath) throws IOException {
-        List<CryptoDto> cryptoEntries = new ArrayList<>();
+    public List<CryptoPriceDTO> parseCsvFile(Path filePath) throws IOException {
+        List<CryptoPriceDTO> cryptoEntries = new ArrayList<>();
         try (FileReader reader = new FileReader(filePath.toFile())) {
             CSVFormat format = CSVFormat.Builder.create()
                     .setHeader("timestamp", "symbol", "price")
@@ -29,7 +29,7 @@ public class CsvParsingServiceImpl implements CsvParsingService {
                 long timestamp = Long.parseLong(record.get("timestamp"));
                 String symbol = record.get("symbol");
                 double price = Double.parseDouble(record.get("price"));
-                cryptoEntries.add(new CryptoDto(timestamp, symbol, price));
+                cryptoEntries.add(new CryptoPriceDTO(timestamp, symbol, price));
             }
         }
         return cryptoEntries;

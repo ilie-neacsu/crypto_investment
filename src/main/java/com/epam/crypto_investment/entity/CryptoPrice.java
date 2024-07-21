@@ -14,10 +14,10 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "cryptos")
+@Table(name = "crypto_prices")
 @NoArgsConstructor
 @AllArgsConstructor
-public class Crypto {
+public class CryptoPrice {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

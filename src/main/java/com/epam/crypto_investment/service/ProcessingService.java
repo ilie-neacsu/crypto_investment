@@ -1,9 +1,9 @@
 package com.epam.crypto_investment.service;
 
-import com.epam.crypto_investment.entity.Crypto;
+import com.epam.crypto_investment.entity.CryptoPrice;
 
 import java.util.List;
 
 public interface ProcessingService {
-    void processCryptos(List<Crypto> cryptos);
+    void processCryptoPrices(List<CryptoPrice> cryptos);
 }

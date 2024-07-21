@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CryptoDto {
+public class CryptoPriceDTO {
 
     @NotNull(message = "Timestamp cannot be null")
     private long timestamp;

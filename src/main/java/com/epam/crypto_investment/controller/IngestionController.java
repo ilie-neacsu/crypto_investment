@@ -1,14 +1,15 @@
 package com.epam.crypto_investment.controller;
 
-import com.epam.crypto_investment.dto.CryptoDto;
-import com.epam.crypto_investment.service.CryptoMapper;
+import com.epam.crypto_investment.dto.CryptoPriceDTO;
+import com.epam.crypto_investment.service.CryptoPriceMapper;
 import com.epam.crypto_investment.service.CsvParsingService;
 import com.epam.crypto_investment.service.ProcessingService;
-import com.epam.crypto_investment.entity.Crypto;
+import com.epam.crypto_investment.entity.CryptoPrice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.DataBinder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,25 +22,42 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/api")
 public class IngestionController {
 
+    public static final int SLEEP_TIME = 300;
+
     private static final Logger logger = Logger.getLogger(IngestionController.class.getName());
 
     private final CsvParsingService csvParsingService;
     private final ProcessingService processingService;
-    private final CryptoMapper cryptoMapper;
+    private final CryptoPriceMapper cryptoPriceMapper;
 
     public IngestionController(
-            CryptoMapper cryptoMapper,
+            CryptoPriceMapper cryptoPriceMapper,
             CsvParsingService csvParsingService,
             ProcessingService processingService) {
-        this.cryptoMapper = cryptoMapper;
+        this.cryptoPriceMapper = cryptoPriceMapper;
         this.csvParsingService = csvParsingService;
         this.processingService = processingService;
+    }
+
+    @GetMapping("/threads-test")
+    public String getResponse(){
+        try {
+            TimeUnit.MILLISECONDS.sleep(SLEEP_TIME);
+        } catch (InterruptedException e) {
+            logger.warning(e.getMessage());
+        }
+
+        logger.info(String.format("Running on thread: %s", Thread.currentThread()));
+
+        long threadId = Thread.currentThread().threadId() ;
+        return  String.valueOf(threadId);
     }
 
     @PostMapping("/ingest")
@@ -50,14 +68,14 @@ public class IngestionController {
 
             Files.copy(file.getInputStream(), tempFile);
 
-            List<CryptoDto> cryptoEntriesDto = csvParsingService.parseCsvFile(tempFile);
+            List<CryptoPriceDTO> cryptoPriceDTOs = csvParsingService.parseCsvFile(tempFile);
 
-            List<Crypto> validCryptos = cryptoEntriesDto.stream()
+            List<CryptoPrice> validCryptoPrices = cryptoPriceDTOs.stream()
                     .filter(this::isValidCryptoDto)
-                    .map(cryptoMapper::toEntity)
+                    .map(cryptoPriceMapper::toEntity)
                     .toList();
 
-            processingService.processCryptos(validCryptos);
+            processingService.processCryptoPrices(validCryptoPrices);
 
             Files.delete(tempFile);
 
@@ -67,7 +85,7 @@ public class IngestionController {
         }
     }
 
-    private boolean isValidCryptoDto(CryptoDto entry) {
+    private boolean isValidCryptoDto(CryptoPriceDTO entry) {
         DataBinder binder = new DataBinder(entry);
         binder.validate();
         BindingResult result = binder.getBindingResult();
