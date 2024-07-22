@@ -14,29 +14,20 @@ public class CryptoPriceMapperImpl implements CryptoPriceMapper {
 
     @Override
     public CryptoPrice toEntity(CryptoPriceDTO dto) {
-        if (dto == null) {
-            return null;
-        }
-
-        CryptoPrice crypto = new CryptoPrice();
-        crypto.setTimestamp(toLocalDateTime(dto.getTimestamp()));
-        crypto.setSymbol(dto.getSymbol());
-        crypto.setPrice(dto.getPrice());
-
-        return crypto;
+        return dto != null ? CryptoPrice.builder()
+                .timestamp(toLocalDateTime(dto.getTimestamp()))
+                .symbol(dto.getSymbol())
+                .price(dto.getPrice())
+                .build() : null;
     }
 
     @Override
     public CryptoPriceDTO toDto(CryptoPrice entity) {
-        if (entity == null) {
-            return null;
-        }
-
-        CryptoPriceDTO dto = new CryptoPriceDTO();
-        dto.setTimestamp(toTimestamp(entity.getTimestamp()));
-        dto.setSymbol(entity.getSymbol());
-        dto.setPrice(entity.getPrice());
-        return dto;
+        return entity != null ? CryptoPriceDTO.builder()
+                .timestamp(toTimestamp(entity.getTimestamp()))
+                .symbol(entity.getSymbol())
+                .price(entity.getPrice())
+                .build() : null;
     }
 
     private LocalDateTime toLocalDateTime(long timestamp) {

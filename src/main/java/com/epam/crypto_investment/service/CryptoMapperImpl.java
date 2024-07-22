@@ -1,0 +1,25 @@
+package com.epam.crypto_investment.service;
+
+import com.epam.crypto_investment.domain.Crypto;
+import com.epam.crypto_investment.dto.CryptoDTO;
+
+public class CryptoMapperImpl implements CryptoMapper {
+
+    @Override
+    public Crypto toEntity(CryptoDTO dto) {
+
+        return  dto != null ? Crypto.builder()
+                .symbol(dto.getSymbol())
+                .normalizedPrice(dto.getNormalizedPrice())
+                .build() : null;
+    }
+
+    @Override
+    public CryptoDTO toDto(Crypto entity) {
+
+        return entity != null ? CryptoDTO.builder()
+                .symbol(entity.getSymbol())
+                .normalizedPrice(entity.getNormalizedPrice())
+                .build() : null;
+    }
+}
