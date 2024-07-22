@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CryptoDTO {
         private String symbol;
-        private double normalizedPrice;
+        private double normalizedRange;
 }

@@ -1,13 +1,16 @@
 package com.epam.crypto_investment.controller;
 
+import com.epam.crypto_investment.dto.CryptoNormRangeDTO;
 import com.epam.crypto_investment.dto.CryptoStatsDTO;
 import com.epam.crypto_investment.service.CryptoService;
 import com.epam.crypto_investment.dto.CryptoDTO;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -30,5 +33,12 @@ public class CryptoController {
         return cryptoService.getCryptoStats(symbol);
     }
 
-
+    @GetMapping("/highest-normalized-range/{date}")
+    public CryptoNormRangeDTO getCryptoWithHighestNormalizedRange(
+            @PathVariable
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate date
+    ) {
+        return cryptoService.getCryptoWithHighestNormalizedRange(date);
+    }
 }

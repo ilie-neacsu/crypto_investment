@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.DataBinder;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,7 +21,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 @RestController
@@ -44,20 +42,6 @@ public class IngestionController {
         this.cryptoPriceMapper = cryptoPriceMapper;
         this.csvParsingService = csvParsingService;
         this.cryptoPriceService = cryptoPriceService;
-    }
-
-    @GetMapping("/threads-test")
-    public String getResponse(){
-        try {
-            TimeUnit.MILLISECONDS.sleep(SLEEP_TIME);
-        } catch (InterruptedException e) {
-            logger.warning(e.getMessage());
-        }
-
-        logger.info(String.format("Running on thread: %s", Thread.currentThread()));
-
-        long threadId = Thread.currentThread().threadId() ;
-        return  String.valueOf(threadId);
     }
 
     @PostMapping("/ingest")

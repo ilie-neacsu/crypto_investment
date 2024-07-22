@@ -10,7 +10,7 @@ public class CryptoMapperImpl implements CryptoMapper {
 
         return  dto != null ? Crypto.builder()
                 .symbol(dto.getSymbol())
-                .normalizedPrice(dto.getNormalizedPrice())
+                .normalizedPrice(dto.getNormalizedRange())
                 .build() : null;
     }
 
@@ -19,7 +19,7 @@ public class CryptoMapperImpl implements CryptoMapper {
 
         return entity != null ? CryptoDTO.builder()
                 .symbol(entity.getSymbol())
-                .normalizedPrice(entity.getNormalizedPrice())
+                .normalizedRange(entity.getNormalizedPrice())
                 .build() : null;
     }
 }
