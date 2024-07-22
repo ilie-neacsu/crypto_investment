@@ -41,4 +41,14 @@ public class CryptoController {
     ) {
         return cryptoService.getCryptoWithHighestNormalizedRange(date);
     }
+
+    @GetMapping("/{symbol}/stats/six-months")
+    public CryptoStatsDTO getCryptoStatsSixMonths(@PathVariable String symbol) {
+        return cryptoService.getCryptoStatsSixMonths(symbol);
+    }
+
+    @GetMapping("/{symbol}/stats/yearly")
+    public CryptoStatsDTO getCryptoStatsYearly(@PathVariable String symbol) {
+        return cryptoService.getCryptoStatsYearly(symbol);
+    }
 }

@@ -13,6 +13,7 @@ import com.epam.crypto_investment.service.mapper.CryptoStatsMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -53,24 +54,29 @@ public class CryptoServiceImpl implements CryptoService {
 
     @Override
     public CryptoStatsDTO getCryptoStats(String symbol) {
+        return getCryptoStats(symbol, null, null);
+    }
+
+    @Override
+    public CryptoStatsDTO getCryptoStats(String symbol, YearMonth startYearMonth, YearMonth endYearMonth) {
 
         CryptoPrice minimumCryptoPrice = monthlyStatRepository
-                .findCryptoStatWithLowestMinimumBySymbol(symbol)
+                .findCryptoStatWithLowestMinimum(symbol, startYearMonth, endYearMonth)
                 .map(MonthlyStat::getMinimumCryptoPrice)
                 .orElseThrow();
 
         CryptoPrice maximumCryptoPrice = monthlyStatRepository
-                .findCryptoStatWithHighestMaximumBySymbol(symbol)
+                .findCryptoStatWithHighestMaximum(symbol, startYearMonth, endYearMonth)
                 .map(MonthlyStat::getMaximumCryptoPrice)
                 .orElseThrow();
 
         CryptoPrice oldestCryptoPrice = monthlyStatRepository
-                .findCryptoStatWithOldestCryptoPriceBySymbol(symbol)
+                .findCryptoStatWithOldestCryptoPrice(symbol, startYearMonth, endYearMonth)
                 .map(MonthlyStat::getOldestCryptoPrice)
                 .orElseThrow();
 
         CryptoPrice newestCryptoPrice = monthlyStatRepository
-                .findCryptoStatWithNewestCryptoPriceBySymbol(symbol)
+                .findCryptoStatWithNewestCryptoPrice(symbol, startYearMonth, endYearMonth)
                 .map(MonthlyStat::getNewestCryptoPrice)
                 .orElseThrow();
 
@@ -83,6 +89,20 @@ public class CryptoServiceImpl implements CryptoService {
 
 
         return cryptoStatsMapper.toDto(cryptoStats);
+    }
+
+    @Override
+    public CryptoStatsDTO getCryptoStatsSixMonths(String symbol) {
+        YearMonth endYearMonth = YearMonth.from(LocalDate.now());
+        YearMonth startYearMonth = YearMonth.from(endYearMonth.minusMonths(6));
+        return getCryptoStats(symbol, startYearMonth, endYearMonth);
+    }
+
+    @Override
+    public CryptoStatsDTO getCryptoStatsYearly(String symbol) {
+        YearMonth endYearMonth = YearMonth.from(LocalDate.now());
+        YearMonth startYearMonth = YearMonth.from(endYearMonth.minusYears(1));
+        return getCryptoStats(symbol, startYearMonth, endYearMonth);
     }
 
     @Override
@@ -122,12 +142,12 @@ public class CryptoServiceImpl implements CryptoService {
     private CryptoDTO mapToCryptoDTO(String symbol) {
 
         double minPrice = monthlyStatRepository
-                .findCryptoStatWithLowestMinimumBySymbol(symbol)
+                .findCryptoStatWithLowestMinimum(symbol)
                 .map(monthlyStat -> monthlyStat.getMinimumCryptoPrice().getPrice())
                 .orElseThrow();
 
         double maxPrice = monthlyStatRepository
-                .findCryptoStatWithHighestMaximumBySymbol(symbol)
+                .findCryptoStatWithHighestMaximum(symbol)
                 .map(monthlyStat -> monthlyStat.getMaximumCryptoPrice().getPrice())
                 .orElseThrow();
 
