@@ -1,4 +1,15 @@
 services:
+  app:
+    image: ineacsu/crypto_investment:latest
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/crypto_investment
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    depends_on:
+      - postgres
+
   postgres:
     image: postgres:latest
     container_name: postgres-db
