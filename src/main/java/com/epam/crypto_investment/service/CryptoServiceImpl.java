@@ -7,10 +7,10 @@ import com.epam.crypto_investment.dto.CryptoStatsDTO;
 import com.epam.crypto_investment.entity.CryptoPrice;
 import com.epam.crypto_investment.entity.DailyStat;
 import com.epam.crypto_investment.entity.MonthlyStat;
+import com.epam.crypto_investment.exception.CryptoNotFoundException;
 import com.epam.crypto_investment.repository.DailyStatRepository;
 import com.epam.crypto_investment.repository.MonthlyStatRepository;
 import com.epam.crypto_investment.service.mapper.CryptoStatsMapper;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -66,7 +66,7 @@ public class CryptoServiceImpl implements CryptoService {
                 monthlyStatRepository.findCryptoStatWithLowestMinimumAndDateRange(symbol, startDate, endDate) :
                 monthlyStatRepository.findCryptoStatWithLowestMinimum(symbol))
                 .map(MonthlyStat::getMinimumCryptoPrice)
-                .orElseThrow();
+                .orElseThrow(() -> new CryptoNotFoundException(symbol + "data not found in this date range"));
 
         CryptoPrice maximumCryptoPrice = (isDateRangeProvided ?
                 monthlyStatRepository.findCryptoStatWithHighestMaximumAndDateRange(symbol, startDate, endDate) :
@@ -78,13 +78,13 @@ public class CryptoServiceImpl implements CryptoService {
                 monthlyStatRepository.findCryptoStatWithOldestCryptoPriceAndDateRange(symbol, startDate, endDate) :
                 monthlyStatRepository.findCryptoStatWithOldestCryptoPrice(symbol))
                 .map(MonthlyStat::getOldestCryptoPrice)
-                .orElseThrow();
+                .orElseThrow(() -> new CryptoNotFoundException(symbol + "data not found in this date range"));
 
         CryptoPrice newestCryptoPrice = (isDateRangeProvided ?
                 monthlyStatRepository.findCryptoStatWithNewestCryptoPriceAndDateRange(symbol, startDate, startDate) :
                 monthlyStatRepository.findCryptoStatWithNewestCryptoPrice(symbol))
                 .map(MonthlyStat::getNewestCryptoPrice)
-                .orElseThrow();
+                .orElseThrow(() -> new CryptoNotFoundException(symbol + "data not found in this date range"));
 
         CryptoStats cryptoStats = CryptoStats.builder()
                 .minimumCryptoPrice(minimumCryptoPrice)
@@ -121,7 +121,7 @@ public class CryptoServiceImpl implements CryptoService {
                 .filter(Objects::nonNull)
                 .map(this::mapCryptoNormRangeDTO)
                 .max(Comparator.comparingDouble(CryptoNormRangeDTO::getNormalizedRange))
-                .orElseThrow();
+                .orElseThrow(() -> new CryptoNotFoundException("No crypto data available"));
     }
 
     private DailyStat getDailyStat(LocalDate date, String symbol) {
@@ -150,12 +150,12 @@ public class CryptoServiceImpl implements CryptoService {
         double minPrice = monthlyStatRepository
                 .findCryptoStatWithLowestMinimum(symbol)
                 .map(monthlyStat -> monthlyStat.getMinimumCryptoPrice().getPrice())
-                .orElseThrow();
+                .orElseThrow(() -> new CryptoNotFoundException(symbol + " data not found in this date range"));
 
         double maxPrice = monthlyStatRepository
                 .findCryptoStatWithHighestMaximum(symbol)
                 .map(monthlyStat -> monthlyStat.getMaximumCryptoPrice().getPrice())
-                .orElseThrow();
+                .orElseThrow(() -> new CryptoNotFoundException(symbol + " data not found in this date range"));
 
         logger.info(String.format("Max price: %f, Min price: %f", maxPrice, minPrice));
 

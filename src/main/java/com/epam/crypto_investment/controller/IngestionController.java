@@ -1,10 +1,17 @@
 package com.epam.crypto_investment.controller;
 
 import com.epam.crypto_investment.dto.CryptoPriceDTO;
+import com.epam.crypto_investment.exception.UnsupportedCryptoException;
 import com.epam.crypto_investment.service.mapper.CryptoPriceMapper;
 import com.epam.crypto_investment.service.CryptoPriceService;
 import com.epam.crypto_investment.service.CsvParsingService;
 import com.epam.crypto_investment.entity.CryptoPrice;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -19,7 +26,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -27,9 +36,11 @@ import java.util.logging.Logger;
 @RequestMapping("/api")
 public class IngestionController {
 
-    public static final int SLEEP_TIME = 300;
-
     private static final Logger logger = Logger.getLogger(IngestionController.class.getName());
+
+    @Value("#{'${supported-cryptos}'.replaceAll(' ', '').split(',')}")
+    private List<String> supportedCryptosList;
+    private Set<String> supportedCryptosSet;
 
     private final CsvParsingService csvParsingService;
     private final CryptoPriceService cryptoPriceService;
@@ -44,17 +55,34 @@ public class IngestionController {
         this.cryptoPriceService = cryptoPriceService;
     }
 
+    @PostConstruct
+    public void init() {
+        supportedCryptosSet = new HashSet<>(supportedCryptosList);
+    }
+
+    @Operation(
+            summary = "Ingest a CSV file of crypto prices",
+            description = "Uploads and processes a CSV file containing crypto prices. " +
+                    "The file should contain entries for a single crypto within the same month.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "CSV file ingested successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid CSV file format or unsupported crypto", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+    })
     @PostMapping("/ingest")
-    public ResponseEntity<String> ingestCsv(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> ingestCsv(@RequestParam("file") MultipartFile file) throws IOException {
+
+        String fileName = UUID.randomUUID() + ".csv";
+        Path tempFile = Paths.get("/tmp", fileName);
+
         try {
-            String fileName = UUID.randomUUID() + ".csv";
-            Path tempFile = Paths.get("/tmp", fileName);
 
             Files.copy(file.getInputStream(), tempFile);
 
             List<CryptoPriceDTO> cryptoPriceDTOs = csvParsingService.parseCsvFile(tempFile);
 
             List<CryptoPrice> validCryptoPrices = cryptoPriceDTOs.stream()
+                    .peek(this::checkIfSupported)
                     .filter(this::isValidCryptoDto)
                     .map(cryptoPriceMapper::toEntity)
                     .toList();
@@ -64,8 +92,14 @@ public class IngestionController {
             Files.delete(tempFile);
 
             return new ResponseEntity<>("CSV file ingested successfully", HttpStatus.OK);
-        } catch (IOException e) {
-            return new ResponseEntity<>("Failed to ingest CSV file", HttpStatus.INTERNAL_SERVER_ERROR);
+        } finally {
+            Files.deleteIfExists(tempFile);
+        }
+    }
+
+    private void checkIfSupported(CryptoPriceDTO entry) {
+        if (!supportedCryptosSet.contains(entry.getSymbol().toUpperCase())) {
+            throw new UnsupportedCryptoException("Crypto " + entry.getSymbol() + " is not supported");
         }
     }
 
