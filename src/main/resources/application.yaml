@@ -14,3 +14,7 @@ spring:
   threads:
     virtual:
       enabled: true
+rate-limiter:
+  capacity: 10
+  refill-tokens: 10
+  refill-duration: 1
