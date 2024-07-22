@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.YearMonth;
+import java.time.LocalDate;
 
 @Data
 @Entity
@@ -21,7 +21,7 @@ public class MonthlyStat {
     private Long id;
 
     @Column(nullable = false)
-    private YearMonth monthYear;
+    private LocalDate date;
 
     @Column(nullable = false)
     private String symbol;

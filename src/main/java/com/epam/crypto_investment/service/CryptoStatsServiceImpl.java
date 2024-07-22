@@ -10,7 +10,6 @@ import jakarta.annotation.PreDestroy;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.YearMonth;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -99,7 +98,7 @@ public class CryptoStatsServiceImpl implements CryptoStatsService {
     private void processMonthlyStat(List<CryptoPrice> cryptoPrices) {
 
         CryptoPrice cryptoPrice = cryptoPrices.getFirst();
-        YearMonth batchYearMonth = YearMonth.from(cryptoPrice.getTimestamp().toLocalDate());
+        LocalDate currentBatchDate = cryptoPrice.getTimestamp().toLocalDate().withDayOfMonth(1);
         String currentBatchSymbol = cryptoPrice.getSymbol();
 
         CryptoPrice minimumCryptoPrice = cryptoPrices.stream()
@@ -119,7 +118,7 @@ public class CryptoStatsServiceImpl implements CryptoStatsService {
                 .orElseThrow();
 
         MonthlyStat monthlyStat = MonthlyStat.builder()
-                .monthYear(batchYearMonth)
+                .date(currentBatchDate)
                 .symbol(currentBatchSymbol)
                 .minimumCryptoPrice(minimumCryptoPrice)
                 .maximumCryptoPrice(maximumCryptoPrice)
