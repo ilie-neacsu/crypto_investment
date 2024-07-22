@@ -1,4 +1,4 @@
-package com.epam.crypto_investment.service;
+package com.epam.crypto_investment.service.mapper;
 
 import com.epam.crypto_investment.domain.Crypto;
 import com.epam.crypto_investment.dto.CryptoDTO;

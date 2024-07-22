@@ -1,8 +1,13 @@
 package com.epam.crypto_investment.service;
 
-import com.epam.crypto_investment.controller.IngestionController;
+import com.epam.crypto_investment.domain.Crypto;
+import com.epam.crypto_investment.domain.CryptoStats;
 import com.epam.crypto_investment.dto.CryptoDTO;
+import com.epam.crypto_investment.dto.CryptoStatsDTO;
+import com.epam.crypto_investment.entity.CryptoPrice;
+import com.epam.crypto_investment.entity.MonthlyStat;
 import com.epam.crypto_investment.repository.MonthlyStatRepository;
+import com.epam.crypto_investment.service.mapper.CryptoStatsMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -15,9 +20,14 @@ public class CryptoServiceImpl implements CryptoService {
     private static final Logger logger = Logger.getLogger(CryptoServiceImpl.class.getName());
 
     private final MonthlyStatRepository monthlyStatRepository;
+    private final CryptoStatsMapper cryptoStatsMapper;
 
-    public CryptoServiceImpl(MonthlyStatRepository monthlyStatRepository) {
+    public CryptoServiceImpl(
+            MonthlyStatRepository monthlyStatRepository,
+            CryptoStatsMapper cryptoStatsMapper
+    ) {
         this.monthlyStatRepository = monthlyStatRepository;
+        this.cryptoStatsMapper = cryptoStatsMapper;
     }
 
     @Override
@@ -34,15 +44,49 @@ public class CryptoServiceImpl implements CryptoService {
 
     }
 
+    @Override
+    public CryptoStatsDTO getCryptoStats(String symbol) {
+
+        CryptoPrice minimumCryptoPrice = monthlyStatRepository
+                .findCryptoStatWithLowestMinimumBySymbol(symbol)
+                .map(MonthlyStat::getMinimumCryptoPrice)
+                .orElseThrow();
+
+        CryptoPrice maximumCryptoPrice = monthlyStatRepository
+                .findCryptoStatWithHighestMaximumBySymbol(symbol)
+                .map(MonthlyStat::getMaximumCryptoPrice)
+                .orElseThrow();
+
+        CryptoPrice oldestCryptoPrice = monthlyStatRepository
+                .findCryptoStatWithOldestCryptoPriceBySymbol(symbol)
+                .map(MonthlyStat::getOldestCryptoPrice)
+                .orElseThrow();
+
+        CryptoPrice newestCryptoPrice = monthlyStatRepository
+                .findCryptoStatWithNewestCryptoPriceBySymbol(symbol)
+                .map(MonthlyStat::getNewestCryptoPrice)
+                .orElseThrow();
+
+        CryptoStats cryptoStats = CryptoStats.builder()
+                .minimumCryptoPrice(minimumCryptoPrice)
+                .maximumCryptoPrice(maximumCryptoPrice)
+                .oldestCryptoPrice(oldestCryptoPrice)
+                .newestCryptoPrice(newestCryptoPrice)
+                .build();
+
+
+        return cryptoStatsMapper.toDto(cryptoStats);
+    }
+
     private CryptoDTO mapToCryptoDTO(String symbol) {
 
         double minPrice = monthlyStatRepository
-                .findLowestMinimumCryptoPriceBySymbol(symbol)
+                .findCryptoStatWithLowestMinimumBySymbol(symbol)
                 .map(monthlyStat -> monthlyStat.getMinimumCryptoPrice().getPrice())
                 .orElseThrow();
 
         double maxPrice = monthlyStatRepository
-                .findLowestMaximumCryptoPriceBySymbol(symbol)
+                .findCryptoStatWithHighestMaximumBySymbol(symbol)
                 .map(monthlyStat -> monthlyStat.getMaximumCryptoPrice().getPrice())
                 .orElseThrow();
 

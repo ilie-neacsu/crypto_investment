@@ -1,7 +1,7 @@
 package com.epam.crypto_investment.controller;
 
 import com.epam.crypto_investment.dto.CryptoPriceDTO;
-import com.epam.crypto_investment.service.CryptoPriceMapper;
+import com.epam.crypto_investment.service.mapper.CryptoPriceMapper;
 import com.epam.crypto_investment.service.CryptoPriceService;
 import com.epam.crypto_investment.service.CsvParsingService;
 import com.epam.crypto_investment.entity.CryptoPrice;
