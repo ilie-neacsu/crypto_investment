@@ -1,5 +1,7 @@
-# Crypto Investment Service
+# Crypto Investment Service (Interview Homework Project)
 
+This is the implementation of a homework project part of the interview process with MX (https://www.mx.com/).
+The specs for the project are awailable [here](https://github.com/ilie-neacsu/crypto_investment/blob/main/docs/crypto_recommendations_service_specs.pdf). 
 This project provides a service for ingesting cryptocurrency data and generating investment recommendations based on various statistics.
 
 ## Prerequisites
