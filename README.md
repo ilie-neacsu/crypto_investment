@@ -1,8 +1,16 @@
 # Crypto Investment Service (Interview Project)
 
-This is the implementation of a homework project that was part of the interviewing process with [MX](https://www.mx.com/).
-The specs for the project are awailable [here](https://github.com/ilie-neacsu/crypto_investment/blob/main/docs/crypto_recommendations_service_specs.pdf). 
-This  provides a service for ingesting cryptocurrency data and generating investment recommendations based on various statistics.
+This is the implementation of a homework project that was part of the interviewing process with [MX](https://www.mx.com/).<br />
+The specs for the project are available [here](https://github.com/ilie-neacsu/crypto_investment/blob/main/docs/crypto_recommendations_service_specs.pdf).<br />
+The [review](https://github.com/ilie-neacsu/crypto_investment/blob/main/docs/mm_task_review.pdf) from MX was unfortunately 
+negative due to the lack of unit/integration.<br /> 
+A crucial takeaway for the future <span style="color: red; font-weight: bold;"> NEVER SKIP AUTOMATED TESTING </span>, 
+regardless of the circumstances and regardless of project (homework or real world project).<br />
+<br />
+
+---
+
+This provides a service for ingesting cryptocurrency data and generating investment recommendations based on various statistics.
 
 ## Prerequisites
 
