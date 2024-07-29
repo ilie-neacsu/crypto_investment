@@ -6,7 +6,6 @@ The [review](https://github.com/ilie-neacsu/crypto_investment/blob/main/docs/mm_
 negative due to the lack of unit/integration tests.<br /> 
 A crucial takeaway for the future <span style="color: red; font-weight: bold;"> NEVER SKIP AUTOMATED TESTING </span>, 
 regardless of the circumstances and regardless of project (homework or real world project).<br />
-<br />
 
 ---
 
